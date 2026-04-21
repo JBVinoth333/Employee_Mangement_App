@@ -1,16 +1,34 @@
-# React + Vite
+# People App Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the Vite frontend for the People app. It is set up to deploy to GitHub Pages from the `main` branch using GitHub Actions.
 
-Currently, two official plugins are available:
+## Local development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Install dependencies and start the dev server:
 
-## React Compiler
+```bash
+npm install
+npm run dev
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+If the frontend needs to talk to a backend outside the same origin, set `VITE_API_BASE_URL` in a local `.env` file:
 
-## Expanding the ESLint configuration
+```env
+VITE_API_BASE_URL=http://localhost:8080
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Publish to GitHub Pages
+
+1. Push this project to a GitHub repository.
+2. In the GitHub repository, open `Settings -> Pages` and set `Source` to `GitHub Actions`.
+3. In the GitHub repository, open `Settings -> Secrets and variables -> Actions -> Variables`.
+4. Add a repository variable named `VITE_API_BASE_URL` and set it to the public backend base URL, for example `https://your-backend.example.com`.
+5. Push to `main` or run the `Deploy People App` workflow manually from the `Actions` tab.
+
+The workflow automatically builds the app with the correct GitHub Pages base path using the repository name, so routes and static assets work under `https://<github-username>.github.io/<repo-name>/`.
+
+## Production notes
+
+- GitHub Pages hosts only the frontend. The People backend must be deployed separately.
+- The app uses browser history routing, and `public/404.html` is already included to restore deep links on GitHub Pages.
+- If the repository name changes, the workflow keeps working because the base path is derived during the build.
