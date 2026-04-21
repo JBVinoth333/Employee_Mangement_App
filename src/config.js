@@ -1,1 +1,5 @@
-export const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const configuredBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
+
+export const BASE_URL = configuredBaseUrl && configuredBaseUrl !== 'undefined'
+	? configuredBaseUrl.replace(/\/$/, '')
+	: '';
