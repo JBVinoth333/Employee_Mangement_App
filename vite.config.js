@@ -5,7 +5,6 @@ import react from '@vitejs/plugin-react'
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const base = env.VITE_APP_BASE_PATH || '/EmployeeManagement'
-
   return {
     plugins: [react()],
     base,
@@ -13,9 +12,6 @@ export default defineConfig(({ mode }) => {
       watch: {
         usePolling: true
       }
-    },
-    build: {
-      outDir: 'dist'
     }
   }
 })
