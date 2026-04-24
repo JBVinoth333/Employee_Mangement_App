@@ -11,7 +11,7 @@ function App() {
 
   return (
     <ThemeProvider>
-      <BrowserRouter basename="/EmployeeManagement">
+      <BrowserRouter basename={routerBase}>
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
