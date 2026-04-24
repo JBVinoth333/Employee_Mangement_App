@@ -7,11 +7,11 @@ import Attendance from './pages/Attendance/Attendance';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
-  const routerBase = (import.meta.env.VITE_APP_BASE_PATH || '/EmployeeManagement').replace(/\/$/, '') || '/EmployeeManagement';
+  const routerBase = (import.meta.env.VITE_APP_BASE_PATH || '/').replace(/\/$/, '') || '/EmployeeManagement';
 
   return (
     <ThemeProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={routerBase}>
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
