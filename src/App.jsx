@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, HashRouter } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import Signup from './pages/Signup/Signup';
 import Login from './pages/Login/Login';
@@ -11,7 +11,7 @@ function App() {
 
   return (
     <ThemeProvider>
-      <BrowserRouter basename={routerBase}>
+      <HashRouter basename={routerBase}>
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
@@ -20,7 +20,7 @@ function App() {
           <Route path="/attendance" element={<ProtectedRoute><Attendance /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </ThemeProvider>
   );
 }
