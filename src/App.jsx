@@ -7,7 +7,7 @@ import Attendance from './pages/Attendance/Attendance';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
-  const routerBase = (import.meta.env.VITE_APP_BASE_PATH || '/').replace(/\/$/, '') || '/';
+  const routerBase = (import.meta.env.VITE_APP_BASE_PATH || '/EmployeeManagement').replace(/\/$/, '') || '/EmployeeManagement';
 
   return (
     <ThemeProvider>
