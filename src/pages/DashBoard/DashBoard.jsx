@@ -31,7 +31,6 @@ function DashBoard() {
   const [jobs, setJobs] = useState([]);
   const [jobPostings, setJobPostings] = useState([]);
 
-  // Job postings tab state
   const [showAddPosting, setShowAddPosting] = useState(false);
   const [viewingPostingApps, setViewingPostingApps] = useState(null);
 

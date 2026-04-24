@@ -16,9 +16,8 @@ function Signup() {
   const [phone, setPhone] = useState('');
   const [message, setMessage] = useState('');
 
-  // Apply-for-job modal state
   const [showApplyModal, setShowApplyModal] = useState(false);
-  const [applyStep, setApplyStep] = useState('list'); // 'list' | 'form' | 'done'
+  const [applyStep, setApplyStep] = useState('list');
   const [postings, setPostings] = useState([]);
   const [postingsLoading, setPostingsLoading] = useState(false);
   const [selectedPosting, setSelectedPosting] = useState(null);
