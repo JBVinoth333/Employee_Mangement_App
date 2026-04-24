@@ -12,6 +12,9 @@ export default defineConfig(({ mode }) => {
       watch: {
         usePolling: true
       }
+    },
+    build: {
+      outDir: 'dist'
     }
   }
 })
