@@ -290,7 +290,7 @@ function DashBoard() {
   }
 
   function checkUpdateAvailability() {
-    fetch(API + '/update', { credentials: 'include' })
+    fetch(API + '/isupdateAvailable', { credentials: 'include' })
       .then(async (res) => {
         if (res.status === 200) {
           setShowUpdateAppButton(true);
