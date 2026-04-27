@@ -58,6 +58,7 @@ function DashBoard() {
   const [showAddDept, setShowAddDept] = useState(false);
   const [showAddEmp, setShowAddEmp] = useState(false);
   const [showAddJob, setShowAddJob] = useState(false);
+  const [showUpdateAppButton, setShowUpdateAppButton] = useState(false);
 
   function loadEmployeeList(searchValue = employeeSearch, statusValue = employeeStatus, departmentValue = employeeDepartment, sortByValue = employeeSortBy, sortOrderValue = employeeSortOrder) {
     const params = new URLSearchParams();
@@ -288,6 +289,28 @@ function DashBoard() {
       .catch(() => {});
   }
 
+  function checkUpdateAvailability() {
+    fetch(API + '/update', { credentials: 'include' })
+      .then(async (res) => {
+        if (res.status === 200) {
+          setShowUpdateAppButton(true);
+          return;
+        }
+
+        let payload = null;
+        try {
+          payload = await res.json();
+        } catch {
+          payload = null;
+        }
+
+        setShowUpdateAppButton(payload?.status === 200);
+      })
+      .catch(() => {
+        setShowUpdateAppButton(false);
+      });
+  }
+
   useEffect(() => {
     fetch(API + '/departments', { credentials: 'include' })
       .then((res) => res.json())
@@ -330,6 +353,18 @@ function DashBoard() {
       .catch(() => {});
   }, []);
 
+  useEffect(() => {
+    checkUpdateAvailability();
+
+    const intervalId = window.setInterval(() => {
+      checkUpdateAvailability();
+    }, 3000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, []);
+
   const activeEmployees = employees.filter((employee) => employee.status === 'Active').length;
   const inactiveEmployees = employees.filter((employee) => employee.status === 'Inactive').length;
   const terminatedEmployees = employees.filter((employee) => employee.status === 'Terminated').length;
@@ -339,9 +374,16 @@ function DashBoard() {
       <div className="dashboard">
         <div className="dashboard-header">
           <h1>Admin Dashboard</h1>
-          <button className="attendance-nav-btn" onClick={() => navigate('/attendance')}>
-            View Attendance
-          </button>
+          <div className="dashboard-header-actions">
+            {showUpdateAppButton && (
+              <button className="update-app-btn" onClick={() => window.location.reload()}>
+                Update App
+              </button>
+            )}
+            <button className="attendance-nav-btn" onClick={() => navigate('/attendance')}>
+              View Attendance
+            </button>
+          </div>
         </div>
 
       <div className="tab-bar">

@@ -10,10 +10,6 @@ function Signup() {
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const [message, setMessage] = useState('');
 
   const [showApplyModal, setShowApplyModal] = useState(false);
@@ -35,7 +31,7 @@ function Signup() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ username, password, firstName, lastName, email, phone }),
+        body: JSON.stringify({ username, password }),
       });
       const data = await response.json();
       if (data.status === 'success') {
@@ -118,10 +114,6 @@ function Signup() {
           {message && <p className="error-msg">{message}</p>}
 
           <div className="grid">
-            <InputField label="First Name" value={firstName} onChange={setFirstName} />
-            <InputField label="Last Name" value={lastName} onChange={setLastName} />
-            <InputField label="Email" type="email" value={email} onChange={setEmail} />
-            <InputField label="Phone" type="tel" value={phone} onChange={setPhone} />
             <InputField label="Username" value={username} onChange={setUsername} />
             <InputField label="Password" type="password" value={password} onChange={setPassword} />
           </div>
