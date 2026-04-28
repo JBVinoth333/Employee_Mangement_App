@@ -79,9 +79,86 @@
   white-space: nowrap;
 }
 
+.update-app-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
 .update-app-btn:hover {
   background: #16a34a;
   color: #fff;
+}
+
+.update-app-btn--restart {
+  border-color: #f59e0b;
+  color: #b45309;
+}
+
+.update-app-btn--restart:hover {
+  background: #f59e0b;
+  color: #fff;
+}
+
+.update-app-btn--revert {
+  border-color: #dc2626;
+  color: #b91c1c;
+}
+
+.update-app-btn--revert:hover {
+  background: #dc2626;
+  color: #fff;
+}
+
+.update-flow-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  box-shadow: var(--shadow);
+}
+
+.update-flow-copy {
+  min-width: 0;
+}
+
+.update-flow-title {
+  margin: 0 0 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.update-flow-status,
+.update-flow-message,
+.update-flow-error {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.update-flow-status {
+  color: var(--text-h);
+}
+
+.update-flow-message {
+  margin-top: 0.35rem;
+  color: var(--text);
+}
+
+.update-flow-error {
+  margin-top: 0.35rem;
+  color: #dc2626;
+}
+
+.update-flow-actions {
+  display: flex;
+  flex-shrink: 0;
 }
 
 .theme-toggle-bottom {
