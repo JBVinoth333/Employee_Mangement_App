@@ -333,7 +333,7 @@ function DashBoard() {
 
         setUpdatePhase(successPhase);
 
-        if (successPhase === 'applied' || successPhase === 'completed') {
+        if (successPhase === 'applied' || successPhase === 'completed' || endpoint === '/restartApp') {
           setUpdateAvailable(false);
         }
       })
@@ -355,17 +355,8 @@ function DashBoard() {
     runUpdateAction(
       '/restartApp',
       'restarting',
-      'completed',
-      'applied'
-    );
-  }
-
-  function handleRevertUpdate() {
-    runUpdateAction(
-      '/revertUpdate',
-      'reverting',
       'idle',
-      'completed'
+      'applied'
     );
   }
 
@@ -386,18 +377,6 @@ function DashBoard() {
           disabled={updatePhase === 'restarting'}
         >
           {updatePhase === 'restarting' ? 'Restarting...' : 'Restart App'}
-        </button>
-      );
-    }
-
-    if (updatePhase === 'completed' || updatePhase === 'reverting') {
-      return (
-        <button
-          className="update-app-btn update-app-btn--revert"
-          onClick={handleRevertUpdate}
-          disabled={updatePhase === 'reverting'}
-        >
-          {updatePhase === 'reverting' ? 'Reverting...' : 'Revert Version'}
         </button>
       );
     }
