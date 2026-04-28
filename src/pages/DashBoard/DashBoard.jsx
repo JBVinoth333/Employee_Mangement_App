@@ -59,9 +59,7 @@ function DashBoard() {
   const [showAddEmp, setShowAddEmp] = useState(false);
   const [showAddJob, setShowAddJob] = useState(false);
   const [updateAvailable, setUpdateAvailable] = useState(false);
-  const [updatePhase, setUpdatePhase] = useState('idle');
-  const [updateMessage, setUpdateMessage] = useState('');
-  const [updateError, setUpdateError] = useState('');
+  const [updatingApp, setUpdatingApp] = useState(false);
 
   function loadEmployeeList(searchValue = employeeSearch, statusValue = employeeStatus, departmentValue = employeeDepartment, sortByValue = employeeSortBy, sortOrderValue = employeeSortOrder) {
     const params = new URLSearchParams();
@@ -314,129 +312,33 @@ function DashBoard() {
       });
   }
 
-  function runUpdateAction(endpoint, pendingPhase, successPhase, failurePhase, fallbackMessage) {
-    setUpdatePhase(pendingPhase);
-    setUpdateError('');
-    setUpdateMessage('');
+  function handleApplyUpdate() {
+    setUpdatingApp(true);
 
-    fetch(API + endpoint, {
+    fetch(API + '/applyUpdate', {
       method: 'POST',
       credentials: 'include',
     })
       .then(async (res) => {
-        let payload = null;
-        try {
-          payload = await res.json();
-        } catch {
-          payload = null;
-        }
-
         if (!res.ok) {
-          throw new Error(payload?.message || 'Request failed.');
+          throw new Error('Request failed.');
         }
 
-        setUpdatePhase(successPhase);
-        setUpdateMessage(payload?.message || fallbackMessage);
-
-        if (successPhase === 'applied' || successPhase === 'completed') {
-          setUpdateAvailable(false);
-        }
+        setUpdateAvailable(false);
       })
-      .catch((error) => {
-        setUpdatePhase(failurePhase);
-        setUpdateError(error.message || 'Request failed.');
+      .catch(() => {
+        setUpdateAvailable(true);
+      })
+      .finally(() => {
+        setUpdatingApp(false);
       });
   }
 
-  function handleApplyUpdate() {
-    runUpdateAction(
-      '/applyUpdate',
-      'applying',
-      'applied',
-      'idle',
-      'Non-destructive changes applied successfully.'
-    );
-  }
-
-  function handleRestartApp() {
-    runUpdateAction(
-      '/restartApp',
-      'restarting',
-      'completed',
-      'applied',
-      'Restart request accepted.'
-    );
-  }
-
-  function handleRevertUpdate() {
-    runUpdateAction(
-      '/revertUpdate',
-      'reverting',
-      'idle',
-      'completed',
-      'Reverted to the previous version successfully.'
-    );
-  }
-
-  function getUpdateStatusText() {
-    if (updatePhase === 'applying') {
-      return 'Applying non-destructive changes.';
-    }
-    if (updatePhase === 'applied') {
-      return 'Non-destructive changes are complete. Restart the app to continue.';
-    }
-    if (updatePhase === 'restarting') {
-      return 'Restart request is being sent.';
-    }
-    if (updatePhase === 'completed') {
-      return 'Update flow completed. You can revert to the previous version if needed.';
-    }
-    if (updatePhase === 'reverting') {
-      return 'Reverting to the previous version.';
-    }
-    if (updateAvailable) {
-      return 'Update available. Apply the non-destructive changes first.';
-    }
-    return updateMessage;
-  }
-
   function renderUpdateActionButton() {
-    if (updatePhase === 'applying') {
-      return (
-        <button className="update-app-btn" disabled>
-          Applying Update...
-        </button>
-      );
-    }
-
-    if (updatePhase === 'applied' || updatePhase === 'restarting') {
-      return (
-        <button
-          className="update-app-btn update-app-btn--restart"
-          onClick={handleRestartApp}
-          disabled={updatePhase === 'restarting'}
-        >
-          {updatePhase === 'restarting' ? 'Restarting...' : 'Restart App'}
-        </button>
-      );
-    }
-
-    if (updatePhase === 'completed' || updatePhase === 'reverting') {
-      return (
-        <button
-          className="update-app-btn update-app-btn--revert"
-          onClick={handleRevertUpdate}
-          disabled={updatePhase === 'reverting'}
-        >
-          {updatePhase === 'reverting' ? 'Reverting...' : 'Revert Version'}
-        </button>
-      );
-    }
-
     if (updateAvailable) {
       return (
-        <button className="update-app-btn" onClick={handleApplyUpdate}>
-          Apply Update
+        <button className="update-app-btn" onClick={handleApplyUpdate} disabled={updatingApp}>
+          {updatingApp ? 'Updating...' : 'Update App'}
         </button>
       );
     }
@@ -487,10 +389,6 @@ function DashBoard() {
   }, []);
 
   useEffect(() => {
-    if (updatePhase !== 'idle') {
-      return undefined;
-    }
-
     checkUpdateAvailability();
 
     const intervalId = window.setInterval(() => {
@@ -500,12 +398,12 @@ function DashBoard() {
     return () => {
       window.clearInterval(intervalId);
     };
-  }, [updatePhase]);
+  }, []);
 
   const activeEmployees = employees.filter((employee) => employee.status === 'Active').length;
   const inactiveEmployees = employees.filter((employee) => employee.status === 'Inactive').length;
   const terminatedEmployees = employees.filter((employee) => employee.status === 'Terminated').length;
-  const shouldShowUpdatePanel = updateAvailable || updatePhase !== 'idle' || Boolean(updateMessage) || Boolean(updateError);
+  const shouldShowUpdatePanel = updateAvailable;
 
   return (
     <>
@@ -521,12 +419,6 @@ function DashBoard() {
 
       {shouldShowUpdatePanel && (
         <div className="update-flow-panel">
-          <div className="update-flow-copy">
-            <p className="update-flow-title">Application Update</p>
-            <p className="update-flow-status">{getUpdateStatusText()}</p>
-            {updateMessage && <p className="update-flow-message">{updateMessage}</p>}
-            {updateError && <p className="update-flow-error">{updateError}</p>}
-          </div>
           <div className="update-flow-actions">
             {renderUpdateActionButton()}
           </div>
