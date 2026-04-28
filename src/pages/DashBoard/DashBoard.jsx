@@ -59,7 +59,7 @@ function DashBoard() {
   const [showAddEmp, setShowAddEmp] = useState(false);
   const [showAddJob, setShowAddJob] = useState(false);
   const [updateAvailable, setUpdateAvailable] = useState(false);
-  const [updatingApp, setUpdatingApp] = useState(false);
+  const [updatePhase, setUpdatePhase] = useState('idle');
 
   function loadEmployeeList(searchValue = employeeSearch, statusValue = employeeStatus, departmentValue = employeeDepartment, sortByValue = employeeSortBy, sortOrderValue = employeeSortOrder) {
     const params = new URLSearchParams();
@@ -312,33 +312,100 @@ function DashBoard() {
       });
   }
 
-  function handleApplyUpdate() {
-    setUpdatingApp(true);
+  function runUpdateAction(endpoint, pendingPhase, successPhase, failurePhase) {
+    setUpdatePhase(pendingPhase);
 
-    fetch(API + '/applyUpdate', {
+    fetch(API + endpoint, {
       method: 'POST',
       credentials: 'include',
     })
       .then(async (res) => {
-        if (!res.ok) {
-          throw new Error('Request failed.');
+        let payload = null;
+        try {
+          payload = await res.json();
+        } catch {
+          payload = null;
         }
 
-        setUpdateAvailable(false);
+        if (!res.ok) {
+          throw new Error(payload?.message || 'Request failed.');
+        }
+
+        setUpdatePhase(successPhase);
+
+        if (successPhase === 'applied' || successPhase === 'completed') {
+          setUpdateAvailable(false);
+        }
       })
       .catch(() => {
-        setUpdateAvailable(true);
-      })
-      .finally(() => {
-        setUpdatingApp(false);
+        setUpdatePhase(failurePhase);
       });
   }
 
+  function handleApplyUpdate() {
+    runUpdateAction(
+      '/applyUpdate',
+      'applying',
+      'applied',
+      'idle'
+    );
+  }
+
+  function handleRestartApp() {
+    runUpdateAction(
+      '/restartApp',
+      'restarting',
+      'completed',
+      'applied'
+    );
+  }
+
+  function handleRevertUpdate() {
+    runUpdateAction(
+      '/revertUpdate',
+      'reverting',
+      'idle',
+      'completed'
+    );
+  }
+
   function renderUpdateActionButton() {
+    if (updatePhase === 'applying') {
+      return (
+        <button className="update-app-btn" disabled>
+          Applying Update...
+        </button>
+      );
+    }
+
+    if (updatePhase === 'applied' || updatePhase === 'restarting') {
+      return (
+        <button
+          className="update-app-btn update-app-btn--restart"
+          onClick={handleRestartApp}
+          disabled={updatePhase === 'restarting'}
+        >
+          {updatePhase === 'restarting' ? 'Restarting...' : 'Restart App'}
+        </button>
+      );
+    }
+
+    if (updatePhase === 'completed' || updatePhase === 'reverting') {
+      return (
+        <button
+          className="update-app-btn update-app-btn--revert"
+          onClick={handleRevertUpdate}
+          disabled={updatePhase === 'reverting'}
+        >
+          {updatePhase === 'reverting' ? 'Reverting...' : 'Revert Version'}
+        </button>
+      );
+    }
+
     if (updateAvailable) {
       return (
-        <button className="update-app-btn" onClick={handleApplyUpdate} disabled={updatingApp}>
-          {updatingApp ? 'Updating...' : 'Update App'}
+        <button className="update-app-btn" onClick={handleApplyUpdate}>
+          Apply Update
         </button>
       );
     }
@@ -389,6 +456,10 @@ function DashBoard() {
   }, []);
 
   useEffect(() => {
+    if (updatePhase !== 'idle') {
+      return undefined;
+    }
+
     checkUpdateAvailability();
 
     const intervalId = window.setInterval(() => {
@@ -398,12 +469,12 @@ function DashBoard() {
     return () => {
       window.clearInterval(intervalId);
     };
-  }, []);
+  }, [updatePhase]);
 
   const activeEmployees = employees.filter((employee) => employee.status === 'Active').length;
   const inactiveEmployees = employees.filter((employee) => employee.status === 'Inactive').length;
   const terminatedEmployees = employees.filter((employee) => employee.status === 'Terminated').length;
-  const shouldShowUpdatePanel = updateAvailable;
+  const shouldShowUpdatePanel = updateAvailable || updatePhase !== 'idle';
 
   return (
     <>
